@@ -3,11 +3,11 @@ services:
     image: postgres:16
     container_name: db
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "5432:5432"
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: f1search_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
