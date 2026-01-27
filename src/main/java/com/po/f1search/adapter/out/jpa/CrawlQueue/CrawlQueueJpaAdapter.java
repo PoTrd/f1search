@@ -25,7 +25,10 @@ public class CrawlQueueJpaAdapter implements CrawlQueueRepository {
 
     @Override
     public CrawlTask getNextTask() {
-        CrawlQueueJpaEntity jpaEntity = jpaRepository.findAll().stream().findFirst().orElse(null);
+        CrawlQueueJpaEntity jpaEntity = jpaRepository.findAll().stream()
+                .filter(entity -> entity.getState().equals(CrawlingState.PENDING.toString()))
+                .findFirst()
+                .orElse(null);
         if (jpaEntity == null) {
             return null;
         }
