@@ -18,6 +18,9 @@ public class WebResourceJpaEntity {
     @UuidGenerator
     private UUID id;
 
+    @Column(name = "domain_id", nullable = false)
+    private UUID domainId;
+
     @Column(nullable = false)
     private String url;
 
@@ -40,6 +43,10 @@ public class WebResourceJpaEntity {
     public UUID getId() {
         return id;
     }
+
+    public UUID getDomainId() { return domainId; }
+
+    public void setDomainId(UUID domainId) { this.domainId = domainId; }
 
     public String getUrl() {
         return url;

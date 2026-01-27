@@ -1,6 +1,7 @@
 package com.po.f1search.adapter.out.jpa.WebResource;
 
 import com.po.f1search.application.ports.out.persistence.WebResourceRepository;
+import com.po.f1search.model.WebDomain.DomainId;
 import com.po.f1search.model.utils.HtmlContent;
 import com.po.f1search.model.WebResource.Metadata;
 import com.po.f1search.model.utils.Url;
@@ -19,9 +20,10 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
         this.jpaRepository = jpaRepository;
     }
 
-    private WebResourceJpaEntity _toJpaEntity(WebResource webResource) {
+    private WebResourceJpaEntity _toJpaEntity(DomainId domainId, WebResource webResource) {
         WebResourceJpaEntity jpaEntity = new WebResourceJpaEntity();
 
+        jpaEntity.setDomainId(domainId.value());
         jpaEntity.setUrl(clean(webResource.url().value()));
         jpaEntity.setHtmlContent(clean(webResource.htmlContent().value()));
         String metadataStr = String.join(";",
@@ -30,7 +32,7 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
                 String.join(",", webResource.metadata().keywords()));
         jpaEntity.setMetadata(clean(metadataStr));
         String linksStr = String.join(",",
-                java.util.Arrays.stream(webResource.lstLinks())
+                webResource.lstLinks().stream()
                         .map(Url::value)
                         .toArray(String[]::new));
         jpaEntity.setLinkList(clean(linksStr));
@@ -42,14 +44,16 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
         String[] metadataParts = metadataRaw.split(";");
         String title = metadataParts.length > 0 ? metadataParts[0] : "";
         String description = metadataParts.length > 1 ? metadataParts[1] : "";
-        String[] keywords = metadataParts.length > 2 ? metadataParts[2].split(",") : new String[]{};
+        List<String> keywords = metadataParts.length > 2 && !metadataParts[2].isEmpty()
+                ? List.of(metadataParts[2].split(","))
+                : List.of();
 
         String linkListRaw = jpaEntity.getLinkList() == null ? "" : jpaEntity.getLinkList();
         String[] linkParts = linkListRaw.isEmpty() ? new String[]{} : linkListRaw.split(",");
-        Url[] lstLinks = java.util.Arrays.stream(linkParts)
+        List<Url> lstLinks = java.util.Arrays.stream(linkParts)
                 .filter(link -> !link.isBlank())
                 .map(Url::new)
-                .toArray(Url[]::new);
+                .toList();
 
         return new WebResource(
                 jpaEntity.getId(),
@@ -61,9 +65,9 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
     }
 
     @Override
-    public void save(WebResource webResource) {
-        WebResourceJpaEntity jpaEntity = _toJpaEntity(webResource);
-            jpaRepository.save(jpaEntity);
+    public void save(DomainId domainId, WebResource webResource) {
+        WebResourceJpaEntity jpaEntity = _toJpaEntity(domainId, webResource);
+        jpaRepository.save(jpaEntity);
     }
 
     private String clean(String value) {
