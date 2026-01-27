@@ -29,3 +29,6 @@ replay_pid*
 
 # Build files
 target
+
+# Configuration files
+application.properties
