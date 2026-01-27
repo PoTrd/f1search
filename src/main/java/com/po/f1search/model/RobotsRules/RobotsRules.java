@@ -1,4 +1,4 @@
-package com.po.f1search.model;
+package com.po.f1search.model.RobotsRules;
 
 import com.po.f1search.model.utils.Url;
 
@@ -14,19 +14,7 @@ public record RobotsRules(
         List<String> allowedPaths,
         Url sitemapLink
 ) {
-
-    public RobotsRules() {
-        this(
-                UUID.randomUUID(),
-                null,
-                null,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                null
-        );
-    }
-
-    public RobotsRules parse(String content) {
+    public static RobotsRules parseFromTxt(String content) {
         Boolean uaF1SearchAllowed = null;
         Boolean isSitemap = null;
         List<String> disallowedPaths = new ArrayList<>();
