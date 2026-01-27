@@ -1,8 +1,7 @@
 package com.po.f1search.adapter.out.web;
 
 import com.po.f1search.application.ports.out.WebRepository;
-import com.po.f1search.model.RobotsRules;
-import com.po.f1search.model.Sitemap;
+import com.po.f1search.model.RobotsRules.RobotsRules;
 import com.po.f1search.model.WebResource.*;
 import com.po.f1search.model.utils.HtmlContent;
 import com.po.f1search.model.utils.Url;
@@ -19,7 +18,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class WebAdapter implements WebRepository {
@@ -104,7 +102,7 @@ public class WebAdapter implements WebRepository {
     }
 
     @Override
-    public RobotsRules getRobotsRules(Url url) {
+    public RobotsRules fetchRobotsRules(Url url) {
         try {
             Url robotsUrl = new Url(url.value().endsWith("/") ? url.value() + "robots.txt" : url.value() + "/robots.txt");
             HttpRequest request = HttpRequest.newBuilder()
@@ -120,36 +118,10 @@ public class WebAdapter implements WebRepository {
                 throw new IOException("Failed to fetch robots.txt: " + robotsUrl + " with status code " + response.statusCode());
             }
             String content = response.body();
-            return new RobotsRules().parse(content);
+            return RobotsRules.parseFromTxt(content);
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Failed to get robots.txt for URL: " + url, e);
         }
-    }
-
-    private Sitemap[] _GetSiteMaps(Url url) throws IOException, InterruptedException {
-        HttpResponse<String> sitemap = httpClient.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create(url.value()))
-                        .timeout(Duration.ofSeconds(10))
-                        .header("User-Agent", "Mozilla/5.0 (compatible; F1SearchBot/1.0; +http://www.example.com/bot)")
-                        .GET()
-                        .build(),
-                HttpResponse.BodyHandlers.ofString()
-        );
-        if (sitemap.statusCode() != 200) {
-            throw new IOException("Failed to fetch sitemap: " + url + " with status code " + sitemap.statusCode());
-        }
-        Document document = Jsoup.parse(sitemap.body(), "", org.jsoup.parser.Parser.xmlParser());
-        Element[] urlElements = document.select("url").toArray(new Element[0]);
-        List<Sitemap> siteMaps = new ArrayList<>();
-        for (Element urlElement : urlElements) {
-            Element locElement = urlElement.selectFirst("loc");
-            Element lastModElement = urlElement.selectFirst("lastmod");
-            Url location = new Url(locElement.text());
-            String lastModified = lastModElement != null ? lastModElement.text() : null;
-            siteMaps.add(new Sitemap(location, lastModified != null ? Long.parseLong(lastModified) : null));
-        }
-        return siteMaps.toArray(new Sitemap[0]);
     }
 }
