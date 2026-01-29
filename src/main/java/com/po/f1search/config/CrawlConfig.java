@@ -10,6 +10,9 @@ import java.util.List;
 @Component
 public class CrawlConfig {
 
+    @Value("${f1search.crawler.max-depth:100}")
+    private int maxCrawlingDepth;
+
     @Value("${f1search.crawler.whitelist}")
     private List<String> whitelistedDomains;
 
@@ -47,5 +50,9 @@ public class CrawlConfig {
 
     public List<String> getWhitelistedDomains() {
         return whitelistedDomains;
+    }
+
+    public int getMaxCrawlingDepth() {
+        return maxCrawlingDepth;
     }
 }

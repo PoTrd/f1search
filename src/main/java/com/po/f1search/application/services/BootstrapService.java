@@ -50,35 +50,52 @@ public class BootstrapService implements BootstrapUseCase {
     public void init() {
         log.info("Crawling process started.");
         if (!this.crawlconfig.isWhiteListingEnabled()) {
-//            log.warn("Whitelist is disabled. The application will not run. Please enable the whitelist to proceed.");
+            log.warn("Whitelist is disabled. The application will not run. Please enable the whitelist to proceed.");
             return;
         }
         log.info("Whitelist OK - Allowed domains: {}", String.join(", ", this.crawlconfig.getWhitelistedDomains()));
-        this.processNextTask();
+        int numberOfWebRessource = this.webResourceRepository.getCountofRessource();
+        while (numberOfWebRessource < this.crawlconfig.getMaxCrawlingDepth()) {
+            boolean shouldContinue = processNextTaskIfAvailable();
+            if (!shouldContinue) {
+                break;
+            }
+            numberOfWebRessource = this.webResourceRepository.getCountofRessource();
+            log.info("Current number of web resources in the database: {}", numberOfWebRessource);
+            log.info("Current number of tasks in the crawl queue: {}", this.crawlQueueRepository.getPendingTaskCount());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Crawling process interrupted: {}", e.getMessage());
+                break;
+            }
+        }
     }
 
-    private void processNextTask() {
+    private boolean processNextTaskIfAvailable() {
         CrawlTask task = crawlQueueRepository.getNextTask();
         boolean isTaskAvailable = task != null && task.state() == CrawlingState.PENDING;
         if (!isTaskAvailable) {
             log.info("No more tasks in the crawl queue.");
-            return;
+            return false;
         }
         boolean isUrlWhitelisted = crawlconfig.isDomainWhitelisted(task.url());
         if (!isUrlWhitelisted) {
             log.warn("URL {} is not whitelisted. Skipping.", this.extractDomainUrl(task.url()).value());
             crawlQueueRepository.updateTaskState(task.id(), CrawlingState.NOT_ALLOWED);
-            processNextTask();
-            return;
+            return true;
         }
 
         try {
             crawlQueueRepository.updateTaskState(task.id(), CrawlingState.IN_PROGRESS);
             executeCrawl(task);
             crawlQueueRepository.updateTaskState(task.id(), CrawlingState.COMPLETED);
+            return true;
         } catch (Exception e) {
             log.error("Error during crawling URL {}: {}", task.url().value(), e.getMessage());
             crawlQueueRepository.updateTaskState(task.id(), CrawlingState.FAILED);
+            return true;
         }
     }
 
@@ -105,7 +122,6 @@ public class BootstrapService implements BootstrapUseCase {
     private DomainId getOrCreateDomain(Url domainUrl) {
         boolean exists = this.webDomainRepository.domainExists(domainUrl);
         if (!exists) {
-            //ask the user to confirm adding the new domain
             DomainId newDomainId = this.webDomainRepository.addDomain(domainUrl);
             log.info("New domain added {}", domainUrl.value());
             return newDomainId;
