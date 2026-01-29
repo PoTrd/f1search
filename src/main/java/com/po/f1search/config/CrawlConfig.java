@@ -10,15 +10,30 @@ import java.util.List;
 @Component
 public class CrawlConfig {
 
+    @Value("${f1search.crawler.actife:false}")
+    private boolean _crawlerActive;
+
+    public boolean isCrawlerActive() {
+        return _crawlerActive;
+    }
+
     @Value("${f1search.crawler.max-depth:100}")
-    private int maxCrawlingDepth;
+    private int _maxCrawlingDepth;
+
+    public int getMaxCrawlingDepth() {
+        return _maxCrawlingDepth;
+    }
 
     @Value("${f1search.crawler.whitelist}")
-    private List<String> whitelistedDomains;
+    private List<String> _whitelistedDomains;
+
+    public List<String> getWhitelistedDomains() {
+        return _whitelistedDomains;
+    }
 
     public boolean isWhiteListingEnabled() {
-        return whitelistedDomains != null
-                && whitelistedDomains.stream()
+        return _whitelistedDomains != null
+                && _whitelistedDomains.stream()
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .anyMatch(this::_isValidDomain);
@@ -41,18 +56,10 @@ public class CrawlConfig {
     public boolean isDomainWhitelisted(Url url) {
         String targetUrl = url.value().trim().toLowerCase();
 
-        return whitelistedDomains.stream()
+        return _whitelistedDomains.stream()
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .map(String::toLowerCase)
                 .anyMatch(targetUrl::startsWith);
-    }
-
-    public List<String> getWhitelistedDomains() {
-        return whitelistedDomains;
-    }
-
-    public int getMaxCrawlingDepth() {
-        return maxCrawlingDepth;
     }
 }

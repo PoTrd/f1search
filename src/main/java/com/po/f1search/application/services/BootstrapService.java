@@ -48,6 +48,10 @@ public class BootstrapService implements BootstrapUseCase {
 
     @Override
     public void init() {
+        if(!this.crawlconfig.isCrawlerActive()) {
+            log.info("Crawler is disabled. Exiting initialization.");
+            return;
+        }
         log.info("Crawling process started.");
         if (!this.crawlconfig.isWhiteListingEnabled()) {
             log.warn("Whitelist is disabled. The application will not run. Please enable the whitelist to proceed.");
