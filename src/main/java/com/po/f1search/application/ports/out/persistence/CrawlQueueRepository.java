@@ -13,4 +13,5 @@ public interface CrawlQueueRepository {
     Boolean isInQueue(Url url);
     void removeFromQueue(UUID id);
     void updateTaskState(UUID id, CrawlingState newState);
+    int getPendingTaskCount();
 }

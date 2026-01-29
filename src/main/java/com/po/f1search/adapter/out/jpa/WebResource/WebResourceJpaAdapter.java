@@ -97,4 +97,9 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
                 .map(this::_toDomainModel)
                 .toList();
     }
+
+    @Override
+    public int getCountofRessource() {
+        return (int) jpaRepository.count();
+    }
 }

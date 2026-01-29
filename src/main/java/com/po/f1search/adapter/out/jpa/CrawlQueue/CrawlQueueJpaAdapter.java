@@ -68,6 +68,13 @@ public class CrawlQueueJpaAdapter implements CrawlQueueRepository {
         jpaRepository.save(jpaEntity);
     }
 
+    @Override
+    public int getPendingTaskCount() {
+        return (int) jpaRepository.findAll().stream()
+                .filter(entity -> entity.getState().equals(CrawlingState.PENDING.toString()))
+                .count();
+    }
+
     private CrawlQueueJpaEntity toJpaEntity(Url url) {
         CrawlQueueJpaEntity jpaEntity = new CrawlQueueJpaEntity();
         jpaEntity.setUrl(url.value());

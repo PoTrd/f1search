@@ -10,4 +10,5 @@ public interface WebResourceRepository {
     void save(DomainId domainId, WebResource webResource);
     WebResource getById(UUID id);
     List<WebResource> getAll();
+    int getCountofRessource();
 }
