@@ -73,7 +73,7 @@ public class WebAdapter implements WebRepository {
             return new WebResource(
                     null,
                     url,
-                    new HtmlContent(html),
+                    new HtmlContent(Jsoup.parse(html).text()),
                     new Metadata(title, description, lstKeywords),
                     List.of(outgoingLinks)
 
