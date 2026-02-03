@@ -10,7 +10,9 @@ public record WebResource(
         UUID id,
         Url url,
         HtmlContent htmlContent,
-        Metadata metadata,
+        String title,
+        String description,
+        List<String> keywords,
         List<Url> lstLinks
 ) {
 }

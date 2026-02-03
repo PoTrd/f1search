@@ -10,13 +10,15 @@ CREATE TABLE IF NOT EXISTS data (
     domain_id UUID NOT NULL REFERENCES web_domains(id),
     url TEXT NOT NULL,
     html_content TEXT,
-    metadata TEXT,
+    title TEXT,
+    description TEXT,
+    keywords TEXT,
     link_list TEXT,
     score DOUBLE PRECISION,
     state TEXT
 );
 
-CREATE TABLE IF NOT EXISTS queue (
+CREATE TABLE IF NOT EXISTS crawl_queue (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url TEXT NOT NULL,
     state TEXT

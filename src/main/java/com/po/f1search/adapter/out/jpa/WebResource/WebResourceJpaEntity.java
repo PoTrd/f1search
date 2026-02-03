@@ -27,8 +27,14 @@ public class WebResourceJpaEntity {
     @Column(name = "html_content", columnDefinition = "TEXT")
     private String htmlContent;
 
-    @Column(columnDefinition = "TEXT")
-    private String metadata;
+    @Column(name = "title", columnDefinition = "TEXT")
+    private String title;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "keywords", columnDefinition = "TEXT")
+    private String keywords;
 
     @Column(name = "link_list", columnDefinition = "TEXT")
     private String linkList;
@@ -64,13 +70,17 @@ public class WebResourceJpaEntity {
         this.htmlContent = htmlContent;
     }
 
-    public String getMetadata() {
-        return metadata;
-    }
+    public String getTitle() { return title; }
 
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public String getKeywords() { return keywords; }
+
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 
     public String getLinkList() {
         return linkList;

@@ -116,7 +116,9 @@ public class BootstrapService implements BootstrapUseCase {
         webResourceRepository.save(domainId, content);
         List<Url> newLinks = content.lstLinks();
         for (Url link : newLinks) {
-            if (!crawlQueueRepository.isInQueue(link)) {
+            boolean isLinkInQueue = crawlQueueRepository.isInQueue(link);
+            boolean isLinkWhitelisted = crawlconfig.isDomainWhitelisted(link);
+            if (!isLinkInQueue && isLinkWhitelisted) {
                 crawlQueueRepository.addToQueue(link);
             }
         }

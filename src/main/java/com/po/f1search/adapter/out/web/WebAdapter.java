@@ -17,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -74,7 +75,9 @@ public class WebAdapter implements WebRepository {
                     null,
                     url,
                     new HtmlContent(Jsoup.parse(html).text()),
-                    new Metadata(title, description, lstKeywords),
+                    title,
+                    description,
+                    lstKeywords,
                     List.of(outgoingLinks)
 
             );
@@ -94,11 +97,26 @@ public class WebAdapter implements WebRepository {
         List<Url> urls = document.select("a[href]")
                 .stream()
                 .map(link -> link.absUrl("href"))
+                .map(String::trim)
+                .filter(href -> !href.isBlank())
+                .map(this::removeFragment)
                 .filter(href -> !href.isBlank())
                 .map(Url::new)
                 .toList();
 
         return urls.toArray(new Url[0]);
+    }
+
+    private String removeFragment(String raw) {
+        int hash = raw.indexOf('#');
+        if (hash >= 0) raw = raw.substring(0, hash);
+
+        try {
+            URI uri = new URI(raw);
+            return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), uri.getQuery(), null).toString();
+        } catch (Exception e) {
+            return raw;
+        }
     }
 
     @Override
