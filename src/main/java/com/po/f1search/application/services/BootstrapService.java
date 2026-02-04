@@ -58,13 +58,13 @@ public class BootstrapService implements BootstrapUseCase {
             return;
         }
         log.info("Whitelist OK - Allowed domains: {}", String.join(", ", this.crawlconfig.getWhitelistedDomains()));
-        int numberOfWebRessource = this.webResourceRepository.getCountofRessource();
+        int numberOfWebRessource = this.webResourceRepository.getCountResource();
         while (numberOfWebRessource < this.crawlconfig.getMaxCrawlingDepth()) {
             boolean shouldContinue = processNextTaskIfAvailable();
             if (!shouldContinue) {
                 break;
             }
-            numberOfWebRessource = this.webResourceRepository.getCountofRessource();
+            numberOfWebRessource = this.webResourceRepository.getCountResource();
             log.info("Current number of web resources in the database: {}", numberOfWebRessource);
             log.info("Current number of tasks in the crawl queue: {}", this.crawlQueueRepository.getPendingTaskCount());
             try {

@@ -2,6 +2,7 @@ package com.po.f1search.adapter.out.jpa.WebResource;
 
 import com.po.f1search.application.ports.out.persistence.WebResourceRepository;
 import com.po.f1search.model.WebDomain.DomainId;
+import com.po.f1search.model.WebResource.WebRessourceState;
 import com.po.f1search.model.utils.HtmlContent;
 import com.po.f1search.model.utils.Url;
 import com.po.f1search.model.WebResource.WebResource;
@@ -30,6 +31,11 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
                         .map(Url::value)
                         .toArray(String[]::new));
         jpaEntity.setLinkList(clean(linksStr));
+        jpaEntity.setTitle(clean(webResource.title()));
+        jpaEntity.setDescription(clean(webResource.description()));
+        String keywordsStr = String.join(",", webResource.keywords());
+        jpaEntity.setKeywords(clean(keywordsStr));
+        jpaEntity.setState(webResource.state().name());
         return jpaEntity;
     }
 
@@ -55,7 +61,8 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
                 title,
                 description,
                 keywords,
-                lstLinks
+                lstLinks,
+                WebRessourceState.valueOf(jpaEntity.getState())
         );
     }
 
@@ -94,7 +101,7 @@ public class WebResourceJpaAdapter implements WebResourceRepository {
     }
 
     @Override
-    public int getCountofRessource() {
+    public int getCountResource() {
         return (int) jpaRepository.count();
     }
 }

@@ -3,6 +3,7 @@ package com.po.f1search.adapter.out.web;
 import com.po.f1search.application.ports.out.WebRepository;
 import com.po.f1search.model.RobotsRules.RobotsRules;
 import com.po.f1search.model.WebResource.WebResource;
+import com.po.f1search.model.WebResource.WebRessourceState;
 import com.po.f1search.model.utils.HtmlContent;
 import com.po.f1search.model.utils.Url;
 import org.jsoup.Jsoup;
@@ -98,7 +99,8 @@ public class WebAdapter implements WebRepository {
                 title,
                 description,
                 lstKeywords,
-                List.of(outgoingLinks)
+                List.of(outgoingLinks),
+                WebRessourceState.RAW
         );
     }
 

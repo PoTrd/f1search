@@ -13,6 +13,7 @@ public record WebResource(
         String title,
         String description,
         List<String> keywords,
-        List<Url> lstLinks
+        List<Url> lstLinks,
+        WebRessourceState state
 ) {
 }
