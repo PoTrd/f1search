@@ -19,6 +19,6 @@ public class ActionController {
     @PostMapping("/indexing/start")
     public ResponseEntity<Void> startIndexing() {
         startIndexUseCase.startIndexing();
-        return ResponseEntity.accepted().build(); // 202 Accepted
+        return ResponseEntity.accepted().build();
     }
 }
