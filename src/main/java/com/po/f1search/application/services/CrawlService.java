@@ -68,7 +68,7 @@ public class CrawlService implements CrawlUseCase {
             log.info("Current number of web resources in the database: {}", numberOfWebRessource);
             log.info("Current number of tasks in the crawl queue: {}", this.crawlQueueRepository.getPendingTaskCount());
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("Crawling process interrupted: {}", e.getMessage());
