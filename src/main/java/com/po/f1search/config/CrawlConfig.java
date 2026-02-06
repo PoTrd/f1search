@@ -10,13 +10,6 @@ import java.util.List;
 @Component
 public class CrawlConfig {
 
-    @Value("${f1search.crawler.actife:false}")
-    private boolean _crawlerActive;
-
-    public boolean isCrawlerActive() {
-        return _crawlerActive;
-    }
-
     @Value("${f1search.crawler.max-depth:100}")
     private int _maxCrawlingDepth;
 
