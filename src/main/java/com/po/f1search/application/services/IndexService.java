@@ -1,6 +1,6 @@
 package com.po.f1search.application.services;
 
-import com.po.f1search.application.ports.in.StartIndexUseCase;
+import com.po.f1search.application.ports.in.IndexUseCase;
 import com.po.f1search.application.ports.out.persistence.IndexRepository;
 import com.po.f1search.application.ports.out.persistence.TermsRepository;
 import com.po.f1search.application.ports.out.persistence.WebResourceRepository;
@@ -15,15 +15,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class StartIndexService implements StartIndexUseCase {
+public class IndexService implements IndexUseCase {
 
-    private static final Logger log = LoggerFactory.getLogger(StartIndexService.class);
+    private static final Logger log = LoggerFactory.getLogger(IndexService.class);
 
     private final WebResourceRepository webResourceRepository;
     private final TermsRepository termsRepository;
     private final IndexRepository indexRepository;
 
-    public StartIndexService(
+    public IndexService(
             WebResourceRepository webResourceRepository,
             TermsRepository termsRepository,
             IndexRepository indexRepository

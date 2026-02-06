@@ -1,6 +1,6 @@
 package com.po.f1search.adapter.in.rest;
 
-import com.po.f1search.application.ports.in.StartIndexUseCase;
+import com.po.f1search.application.ports.in.IndexUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @Component
 public class ActionController {
 
-    private final StartIndexUseCase startIndexUseCase;
+    private final IndexUseCase indexUseCase;
 
-    public ActionController(StartIndexUseCase startIndexUseCase) {
-        this.startIndexUseCase = startIndexUseCase;
+    public ActionController(IndexUseCase startIndexUseCase) {
+        this.indexUseCase = startIndexUseCase;
     }
 
     @PostMapping("/indexing/start")
     public ResponseEntity<Void> startIndexing() {
-        startIndexUseCase.indexing();
+        indexUseCase.indexing();
         return ResponseEntity.accepted().build();
     }
 }
