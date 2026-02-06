@@ -34,66 +34,82 @@ public class StartIndexService implements StartIndexUseCase {
     }
 
     @Override
-    public void startIndexing() {
+    public void indexing() {
         log.info("Starting indexing process...");
 
-        this.indexRepository.deleteAll();
-        this.termsRepository.deleteAll();
+        _handleCleanup();
 
-        // Extract terms and compute document frequencies
         List<WebResource> resources = webResourceRepository.getAll();
-        Map<String, Long> termDfMap = resources.stream()
-                .map(resource -> resource.htmlContent().value())
-                .flatMap(content -> _extractUniqueTermsSet(content).stream())
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        List<Term> terms = termDfMap.entrySet().stream()
-                .map(entry -> new Term(
-                        entry.getKey(),
-                        entry.getValue()
-                ))
-                .collect(Collectors.toList());
-
-        //Batch save terms to the database withe a size of 500 terms by batch
-        int batchSize = 500;
-        List<Term> savedTerms = new ArrayList<>();
-        for (int i = 0; i < terms.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, terms.size());
-            List<Term> batch = terms.subList(i, end);
-            savedTerms.addAll(termsRepository.saveLstTerms(batch));
+        if (resources.isEmpty()) {
+            log.warn("No resources found to index.");
+            return;
         }
 
-        // Build the inverted index with tf-idf scores
-        int totalDocuments = resources.size();
-        for (WebResource resource : resources) {
-            String content = resource.htmlContent().value();
-            String[] tokens = content.split("\\W+");
-            Map<String, Long> termTfMap = Arrays.stream(tokens)
-                    .filter(token -> !token.isBlank())
-                    .map(String::toLowerCase)
-                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-            for (Map.Entry<String, Long> entry : termTfMap.entrySet()) {
-                String termValue = entry.getKey();
-                Long tf = entry.getValue();
-                Long df = termDfMap.get(termValue);
-                double idf = Math.log((double) totalDocuments / df);
-                double tfIdf = tf * idf;
-                indexRepository.saveIndexEntry(
-                        // Find the term ID from the saved terms list
-                        savedTerms.stream().filter(term -> term.value().equals(termValue))
-                                .findFirst()
-                                .orElseThrow(() -> new RuntimeException("Term not found: " + termValue)).id(),
-                        resource.id(),
-                        tf,
-                        tfIdf
-                );
-            }
-        }
+        Map<String, Long> termDfMap = _computeDocumentFrequencies(resources);
+        Map<String, Term> savedTermsMap = _handleIndexBatchSave(termDfMap);
 
-        log.info("Indexing process completed.");
+        _buildAndSaveInvertedIndex(resources, termDfMap, savedTermsMap);
+
+        log.info("Indexing process completed successfully.");
     }
 
-    private Set<String> _extractUniqueTermsSet(String content) {
+    private void _handleCleanup() {
+        indexRepository.deleteAll();
+        termsRepository.deleteAll();
+    }
+
+    private Map<String, Long> _computeDocumentFrequencies(List<WebResource> resources) {
+        return resources.stream()
+                .map(res -> res.htmlContent().value())
+                .flatMap(content -> _extractUniqueTerms(content).stream())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    }
+
+    private Map<String, Term> _handleIndexBatchSave(Map<String, Long> termDfMap) {
+        List<Term> termsToSave = termDfMap.entrySet().stream()
+                .map(e -> new Term(e.getKey(), e.getValue()))
+                .toList();
+
+        int batchSize = 500;
+        List<Term> allSavedTerms = new ArrayList<>();
+
+        for (int i = 0; i < termsToSave.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, termsToSave.size());
+            allSavedTerms.addAll(termsRepository.saveLstTerms(termsToSave.subList(i, end)));
+        }
+
+        return allSavedTerms.stream()
+                .collect(Collectors.toMap(Term::value, Function.identity()));
+    }
+
+    private void _buildAndSaveInvertedIndex(List<WebResource> resources,
+                                            Map<String, Long> termDfMap,
+                                            Map<String, Term> savedTermsMap) {
+        int totalDocs = resources.size();
+
+        for (WebResource resource : resources) {
+            Map<String, Long> termTfMap = _computeTermFrequencies(resource.htmlContent().value());
+
+            termTfMap.forEach((termValue, tf) -> {
+                double idf = Math.log((double) totalDocs / termDfMap.get(termValue));
+                double tfIdf = tf * idf;
+
+                Term term = savedTermsMap.get(termValue);
+                if (term != null) {
+                    indexRepository.saveIndexEntry(term.id(), resource.id(), tf, tfIdf);
+                }
+            });
+        }
+    }
+
+    private Map<String, Long> _computeTermFrequencies(String content) {
+        return Arrays.stream(content.split("\\W+"))
+                .filter(token -> !token.isBlank())
+                .map(String::toLowerCase)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    }
+
+    private Set<String> _extractUniqueTerms(String content) {
         return Arrays.stream(content.split("\\W+"))
                 .filter(token -> !token.isBlank())
                 .map(String::toLowerCase)
