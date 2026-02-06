@@ -5,7 +5,6 @@ import com.po.f1search.model.Term.Term;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -55,6 +54,16 @@ public class TermsJpaAdapter implements TermsRepository {
         List<TermsJpaEntity> jpaEntities = jpaRepository.findAll();
         return jpaEntities.stream()
                 .map(this::_toDomainModel)
+                .toList();
+    }
+
+    @Override
+    public List<UUID> getTermIdsByValue(String termValue) {
+        List<TermsJpaEntity> jpaEntities = jpaRepository.findAll().stream()
+                .filter(entity -> entity.getTerm().equalsIgnoreCase(termValue))
+                .toList();
+        return jpaEntities.stream()
+                .map(TermsJpaEntity::getId)
                 .toList();
     }
 

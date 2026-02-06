@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/actions")
 @Component
-public class ActionController {
+public class AdminActionController {
 
     private final IndexUseCase indexUseCase;
     private final CrawlUseCase crawlUseCase;
 
-    public ActionController(
+    public AdminActionController(
             IndexUseCase startIndexUseCase,
             CrawlUseCase startCrawlUseCase
     ) {
