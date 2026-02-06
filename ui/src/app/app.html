@@ -1,0 +1,24 @@
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">F1</div>
+      <div>
+        <p class="brand-title">F1Search</p>
+        <p class="brand-sub">Precision crawling for race intelligence</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Search</a>
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <p>F1Search © 2026</p>
+    <p>Built for the Spring Boot indexer.</p>
+  </footer>
+</div>

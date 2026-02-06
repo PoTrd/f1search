@@ -1,0 +1,70 @@
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Track. Crawl. Discover.</p>
+    <h1>F1Search</h1>
+    <p class="lead">
+      A precision search engine tuned for high-velocity crawling and indexing.
+    </p>
+    <div class="prompt-row">
+      <button type="button" (click)="usePrompt('latest race results')">Latest race results</button>
+      <button type="button" (click)="usePrompt('team standings 2024')">Team standings 2024</button>
+      <button type="button" (click)="usePrompt('driver stats')">Driver stats</button>
+    </div>
+  </div>
+  <div class="hero-card">
+    <form class="search-form" (ngSubmit)="submit()">
+      <label for="query">Search</label>
+      <div class="search-input">
+        <input
+          id="query"
+          name="query"
+          type="text"
+          placeholder="Search the index"
+          [(ngModel)]="query"
+          autocomplete="off"
+        />
+        <button type="submit" [disabled]="loading()">Go</button>
+      </div>
+      <p class="hint">Powered by `/api/search`</p>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="status">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="status">
+        <span>Searching the index…</span>
+      </div>
+    }
+
+    @if (showSummary()) {
+      <div class="summary">
+        <span>{{ resultsCount() }} results for "{{ lastQuery() }}"</span>
+      </div>
+    }
+  </div>
+</section>
+
+@if (!loading()) {
+  <section class="results">
+    @for (result of results(); track result.url) {
+      <article class="result-card">
+        <div class="result-top">
+          <h3>{{ result.title }}</h3>
+          <a [href]="result.url" target="_blank" rel="noopener">{{ result.url }}</a>
+        </div>
+        <p>{{ result.description || 'No description available.' }}</p>
+      </article>
+    }
+
+    @if (showEmpty()) {
+      <div class="empty">
+        <h3>No results yet</h3>
+        <p>Try refining your query or re-run the crawler from the admin panel.</p>
+      </div>
+    }
+  </section>
+}

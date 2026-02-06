@@ -1,0 +1,94 @@
+<section class="admin-shell">
+  <div class="admin-header">
+    <div>
+      <p class="eyebrow">Admin Console</p>
+      <h1>Control the crawl pipeline</h1>
+      <p class="lead">
+        Trigger crawling, indexing, and monitor latest actions.
+      </p>
+    </div>
+    <div class="badge">/api/actions</div>
+  </div>
+
+  @if (showLogin()) {
+    <div class="panel login-only">
+      <div class="panel-head">
+        <h2>Operator Access</h2>
+        <p>Enter admin credentials to unlock the console.</p>
+      </div>
+
+      <form (ngSubmit)="login()" class="login-form">
+        <label>
+          Username
+          <input type="text" name="username" [(ngModel)]="username" />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" [(ngModel)]="password" />
+        </label>
+        <button type="submit">Sign in</button>
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+      </form>
+    </div>
+  }
+
+  @if (showAdmin()) {
+    <div class="admin-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Operator Access</h2>
+          <p>Hard-coded credentials for now.</p>
+        </div>
+
+        <div class="authed">
+          <p class="success">Authenticated as admin.</p>
+          <button type="button" class="ghost" (click)="logout()">Sign out</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Actions</h2>
+          <p>Fire a task and review the response.</p>
+        </div>
+
+        <div class="actions">
+          <button type="button" (click)="startCrawling()" [disabled]="busy()">
+            Start crawling
+          </button>
+          <button type="button" (click)="stopCrawling()" [disabled]="busy()" class="ghost">
+            Stop crawling
+          </button>
+          <button type="button" (click)="startIndexing()" [disabled]="busy()" class="accent">
+            Start indexing
+          </button>
+        </div>
+      </div>
+
+      <div class="panel logs">
+        <div class="panel-head">
+          <h2>Action Log</h2>
+          <p>Latest commands sent to the backend.</p>
+        </div>
+
+        @for (entry of logs(); track entry.time + entry.action) {
+          <div class="log-entry">
+            <div>
+              <strong>{{ entry.action }}</strong>
+              <span>{{ entry.time }}</span>
+            </div>
+            <span class="status" [class.success]="entry.status === 'success'" [class.error]="entry.status === 'error'">
+              {{ entry.status }}
+            </span>
+          </div>
+        }
+
+        @if (!hasLogs()) {
+          <p class="empty">No admin actions yet.</p>
+        }
+      </div>
+    </div>
+  }
+</section>

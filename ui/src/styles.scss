@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'Space Grotesk';
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/spacegrotesk/v17/V9VUPER35n7kLjEwV6D2kH3bJ3b1.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Sans';
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/instrumentsans/v9/pxiEyp8kv8JHgFVrFJDUc1NECPY.woff2') format('woff2');
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #080b12;
+  --bg-accent: #121726;
+  --surface: rgba(14, 18, 29, 0.88);
+  --text: #f7f4ef;
+  --text-muted: #a3adbd;
+  --accent: #f7b267;
+  --border: rgba(148, 162, 190, 0.2);
+  --shadow-soft: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  background: radial-gradient(circle at top left, rgba(255, 189, 122, 0.15), transparent 45%),
+    radial-gradient(circle at 20% 60%, rgba(98, 138, 255, 0.12), transparent 50%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-accent) 100%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
