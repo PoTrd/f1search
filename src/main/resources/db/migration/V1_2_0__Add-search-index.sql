@@ -5,7 +5,8 @@ DROP COLUMN IF EXISTS score;
 -- 2) Terms table (vocabulary)
 CREATE TABLE IF NOT EXISTS terms (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    term TEXT NOT NULL UNIQUE
+    term TEXT NOT NULL UNIQUE,
+    df INT NOT NULL DEFAULT 0
     );
 
 -- 3) Inverted index table (term -> resource)
